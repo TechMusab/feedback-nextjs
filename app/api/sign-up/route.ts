@@ -57,9 +57,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ message: "User created successfully, please check your email for verification" }, { status: 201 });
 
        
-    }
-
-        
+    }   
     catch (error) {
         console.error("Error connecting to the database:", error);
         return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
