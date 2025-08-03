@@ -1,10 +1,11 @@
 import connectDB from "@/app/lib/connectDB";
 import { NextResponse } from "next/server";
-import  UserModel  from "@/app/models/user";
+import UserModel from "@/app/models/User";
 import bcrypt from "bcryptjs";
 import { sendVerificatonEmail } from "@/app/lib/sendVerificatonEmail";
 
 export async function POST(request: Request) {
+    console.log("in sign-up route");
     await connectDB();
     try {
         const {username,email,password} = await request.json();
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
         if (existingUser) {
             return NextResponse.json({ error: "Username already exists" }, { status: 400 });
         }
-        const existingUserByEmail=UserModel.findOne({ email})
+        const existingUserByEmail=await UserModel.findOne({ email})
         if (existingUserByEmail) {
             if(existingUserByEmail.isVerified){
                 return NextResponse.json({ error: "Email already exists" }, { status: 400 });

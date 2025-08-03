@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ✅ NextAuth Setup Notes 
 
-## Getting Started
+## 1. Create Auth Folder and Files
+- Create folder: `app/api/auth/[...nextauth]/`
+- Add two files inside:
+  - `options.ts` → contains and exports `authOptions`
+  - `route.ts` → imports `authOptions` and passes it to NextAuth handler
+  - Export handler as `GET` and `POST`
 
-First, run the development server:
+## 2. Define Auth Options (`options.ts`)
+- Set up providers (e.g., GitHub, Google)
+- Configure callbacks (e.g., modify session)
+- Export the `authOptions` object
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 3. API Route Handler (`route.ts`)
+- Import `NextAuth` and `authOptions`
+- Initialize handler with `NextAuth(authOptions)`
+- Export:
+  ```ts
+  export { handler as GET, handler as POST }
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 4. Create AuthProvider Component
+- Path: context/AuthProvider.tsx
+- Wrap children with SessionProvider from next-auth/react
+- Use this provider in your root layout
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 5. Add Middleware for Route Protection
+- Create middleware.ts at root
+- Use withAuth to protect routes
+- Configure matcher for protected paths
+- Redirect unauthenticated users to login
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 6. Extend NextAuth Types
+- Create file: types/next-auth.d.ts
+- Extend Session and User interfaces to include custom fields
+- Ensures type safety in authOptions and across the app
 
-## Learn More
+# ✅ Email sending
 
-To learn more about Next.js, take a look at the following resources:
+- Resend for sending emails
+- configure email template usng react email 
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
