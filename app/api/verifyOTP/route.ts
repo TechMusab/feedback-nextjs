@@ -1,6 +1,5 @@
 import connectDB from "@/app/lib/connectDB";
 import UserModel from "@/app/models/User";
-import { usernameVallidation } from "@/app/schemas/signupSchema";
 
 export async function POST(request: Request) {
     await connectDB();
@@ -20,7 +19,8 @@ export async function POST(request: Request) {
         });
     }
     const isCodeValid = user.VerifyCode === code;
-    const isCodeExpired = new Date(user.VerifyCodeExpires) > new Date();
+    const isCodeExpired = user.VerifyCodeExpires < new Date();
+    console.log("isCodeValid", isCodeValid, "isCodeExpired", isCodeExpired);
     if (!isCodeValid || isCodeExpired) {
         return new Response(JSON.stringify({
             success: false,
