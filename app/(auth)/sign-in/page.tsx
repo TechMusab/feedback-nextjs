@@ -38,7 +38,7 @@ const Page = () => {
   const onSubmit = async (data: z.infer<typeof signinSchema>) => {
     setIsSubmitting(true)
    const res= await signIn('credentials',{
-        idenetifier: data.identifier,
+        identifier: data.identifier,
         password: data.password,
         redirect: false,
     })
@@ -50,7 +50,6 @@ const Page = () => {
     if(res?.url) {
     toast.success("Sign in successful!");
         setIsSubmitting(false);
-        router.replace('/dashboard');
     }
   };
   return (

@@ -16,10 +16,11 @@ const authOptions: NextAuthOptions = {
             async authorize(credentials:any):Promise<any>{
                 await connectDB();
                 try {
+                    console.log(credentials.identifier)
                     const user=await UserModel.findOne({
                         $or:[
-                            {email:credentials.identifier.email},
-                            {username:credentials.identifier.username}
+                            {email:credentials.identifier},
+                            {username:credentials.identifier}
                         ]
                     })
                     if(!user) throw new Error("No user found with the provided credentials");
