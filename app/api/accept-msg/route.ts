@@ -19,12 +19,12 @@ export async function POST(request: Request) {
     );
   }
   const userId = user._id;
-  const { acptmsg } = await request.json();
+  const { acceptMessages } = await request.json();
   try {
     const updatedUser = await UserModel.findByIdAndUpdate(
       userId,
       {
-        acceptMsg: acptmsg,
+        isAcceptingMsg: acceptMessages,
       },
       {
         new: true,
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       JSON.stringify({
         success: true,
         message: "Accept message updated successfully",
-        data: updatedUser,
+        isAcceptingMsg: updatedUser.isAcceptingMsg,
       }),
       {
         status: 200,
@@ -81,12 +81,12 @@ export async function GET(request: Request) {
   }
   const userId = user._id;
   try {
-    const acptmsg = await UserModel.findById(userId).select("acceptMsg");
-    if (!acptmsg) {
+    const userDoc = await UserModel.findById(userId).select("isAcceptingMsg");
+    if (!userDoc) {
       return Response.json(
         {
           success: false,
-          message: "Accept message not found",
+          message: "User not found",
         },
         {
           status: 404,
@@ -96,7 +96,7 @@ export async function GET(request: Request) {
     return Response.json(
       {
         success: true,
-        data: acptmsg,
+        isAcceptingMsg: userDoc.isAcceptingMsg,
       },
       {
         status: 200,

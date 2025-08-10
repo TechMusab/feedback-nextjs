@@ -7,8 +7,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import axios, { AxiosError } from "axios";
-import { ApiResponse } from "@/app/types/apiResponse";
 import {
   Form,
   FormControl,
@@ -36,20 +34,21 @@ const Page = () => {
   });
 
   const onSubmit = async (data: z.infer<typeof signinSchema>) => {
-    setIsSubmitting(true)
-   const res= await signIn('credentials',{
-        identifier: data.identifier,
-        password: data.password,
-        redirect: false,
-    })
-    if(res?.error) {
+    setIsSubmitting(true);
+    const res = await signIn("credentials", {
+      identifier: data.identifier,
+      password: data.password,
+      redirect: false,
+    });
+    if (res?.error) {
       toast.error(res.error);
       setIsSubmitting(false);
       return;
     }
-    if(res?.url) {
-    toast.success("Sign in successful!");
-        setIsSubmitting(false);
+    if (res?.ok) {
+      toast.success("Sign in successful!");
+      router.push("/dashboard");
+      setIsSubmitting(false);
     }
   };
   return (

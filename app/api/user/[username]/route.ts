@@ -1,13 +1,16 @@
 import connectDB from "@/app/lib/connectDB";
 import UserModel from "@/app/models/User";
 
-import { Message } from "@/app/models/User";
-
-export async function POST(request: Request) {
+export async function GET(
+  request: Request,
+  { params }: { params: { username: string } }
+) {
   await connectDB();
-  const { username, message } = await request.json();
+  
   try {
-    const user = await UserModel.findOne({ username });
+    const user = await UserModel.findOne({ username: params.username })
+      .select("username isAcceptingMsg isVerified");
+    
     if (!user) {
       return new Response(
         JSON.stringify({
@@ -19,35 +22,33 @@ export async function POST(request: Request) {
         }
       );
     }
-    if (!user.isAcceptingMsg) {
+
+    if (!user.isVerified) {
       return new Response(
         JSON.stringify({
           success: false,
-          message: "User has not accepted messages",
+          message: "User not verified",
         }),
         {
-          status: 403,
+          status: 404,
         }
       );
     }
-    const newMessage: Message = {
-      content: message,
-      createdAt: new Date(),
-    };
-    user.messages.push(newMessage);
-    await user.save();
+
     return new Response(
       JSON.stringify({
         success: true,
-        message: "Message sent successfully",
-        data: newMessage,
+        user: {
+          username: user.username,
+          isAcceptingMsg: user.isAcceptingMsg,
+        },
       }),
       {
         status: 200,
       }
     );
   } catch (error) {
-    console.error("Error sending message:", error);
+    console.error("Error fetching user:", error);
     return new Response(
       JSON.stringify({
         success: false,
@@ -58,4 +59,4 @@ export async function POST(request: Request) {
       }
     );
   }
-}
+} 

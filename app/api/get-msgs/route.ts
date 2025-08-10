@@ -8,8 +8,8 @@ import mongoose from "mongoose";
 export async function GET(request: Request) {
     await connectDB();
     const session = await getServerSession(authOptions);
-    const user = session?.user as User;
-    if (!session || !session.user) {
+    const sessionUser = session?.user as User;
+    if (!session || !sessionUser) {
         return new Response(
             JSON.stringify({
                 success: false,
@@ -20,21 +20,11 @@ export async function GET(request: Request) {
             }
         );
     }
-    const userId = new mongoose.Types.ObjectId(user._id);
+    const userId = new mongoose.Types.ObjectId(sessionUser._id);
     try {
-        const user=UserModel.aggregate([
-            {$match: {_id: userId}},
-            {$unwind: "$messages" },
-            {$sort: {"messages.createdAt": -1} },
-            {
-                $group:{
-                    _id: "$_id",
-                    messages: {$push: "$messages"},
-                }
-            }
-
-        ])
-        if(!user || user.length===0) {
+        // First check if user exists
+        const user = await UserModel.findById(userId);
+        if (!user) {
             return new Response(
                 JSON.stringify({
                     success: false,
@@ -45,11 +35,31 @@ export async function GET(request: Request) {
                 }
             );
         }
+
+        // If user has no messages, return empty array
+        if (!user.messages || user.messages.length === 0) {
+            return new Response(
+                JSON.stringify({
+                    success: true,
+                    message: "Messages fetched successfully",
+                    messeges: [],
+                }),
+                {
+                    status: 200,
+                }
+            );
+        }
+
+        // If user has messages, sort them by createdAt
+        const sortedMessages = user.messages.sort((a, b) => 
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        
         return new Response(
             JSON.stringify({
                 success: true,
                 message: "Messages fetched successfully",
-                data: user[0].messages,
+                messeges: sortedMessages,
             }),
             {
                 status: 200,

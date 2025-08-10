@@ -3,6 +3,7 @@ import { Message } from "../models/User";
 export interface ApiResponse{
     success: boolean;
     message: string;
-    isAcceptingMsgs?: boolean;
+    isAcceptingMsg?: boolean;
     messeges?: Array<Message>;
+    data?: any;
 }
